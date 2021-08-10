@@ -1,3 +1,5 @@
+/// <reference path = "Field.ts" />
+
 class FieldDisplay extends Field implements IFieldDisplay {
     canvasManager: CanvasManager;
     private _step: number;

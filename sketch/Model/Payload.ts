@@ -1,7 +1,9 @@
 class Payload {
     isEmpty: boolean;
-    constructor(isEmpty = true) {
+    isFrozen: boolean;
+    constructor(isEmpty = true, isFrozen = false) {
         this.isEmpty = isEmpty;
+        this.isFrozen = isFrozen;
     }
 
     Copy() {

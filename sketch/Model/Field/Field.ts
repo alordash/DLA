@@ -93,14 +93,7 @@ class Field implements IField {
     }
 
     stage = 0;
-    stageActions: Array<() => boolean> = [
-        () => {
-            for (let cells of this.cells)
-                for (let cell of cells)
-                    cell.payload = Payload.Random();
-            return false;
-        }
-    ];
+    stageActions: Array<() => boolean> = [];
     Evolve() {
         if (this.stage >= this.stageActions.length) {
             console.log('Done evolving');

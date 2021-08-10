@@ -216,7 +216,7 @@ function main() {
     const h = parseInt(document.getElementById("HeightInput").value);
     const step = parseInt(document.getElementById("StepInput").value);
     canvasManager = new CanvasManager(w, h, _p);
-    fieldDisplay = new FieldDisplay(canvasManager, w, h, step);
+    fieldDisplay = new DLA(canvasManager, w, h, step);
     UIControl.UpdateField();
     fieldDisplay.Display();
     console.log('main done');
@@ -237,8 +237,9 @@ class Vec2 {
     }
 }
 class Payload {
-    constructor(isEmpty = true) {
+    constructor(isEmpty = true, isFrozen = false) {
         this.isEmpty = isEmpty;
+        this.isFrozen = isFrozen;
     }
     Copy() {
         return new Payload(this.isEmpty);
@@ -279,14 +280,7 @@ class Cell {
 class Field {
     constructor(width, height, payload = undefined) {
         this.stage = 0;
-        this.stageActions = [
-            () => {
-                for (let cells of this.cells)
-                    for (let cell of cells)
-                        cell.payload = Payload.Random();
-                return false;
-            }
-        ];
+        this.stageActions = [];
         this.cells = new Array();
         this.Resize(width, height, true, payload);
     }
@@ -421,6 +415,61 @@ class FieldDisplay extends Field {
                 this.DrawCell(cell);
             }
         }
+    }
+}
+class DLA extends FieldDisplay {
+    constructor(canvasManager, width = 0, height = 0, step = 1, payload = undefined) {
+        super(canvasManager, width, height, step, payload);
+        this.fillment = 10;
+        this.stageActions = [
+            () => {
+                for (let i = 0; i < this.particles.length; i++) {
+                    let p = this.particles[i];
+                    let moves = World.MoveDirections.slice();
+                    Calc.Shuffle(moves);
+                    let skip = false;
+                    for (let move of moves) {
+                        let _p = p.pos.Sum(move);
+                        if (!Calc.IsInside(_p.x, _p.y, this.cells))
+                            continue;
+                        let cell = this.cells[_p.x][_p.y];
+                        if (!cell.payload.isEmpty) {
+                            p.payload.isFrozen = true;
+                            skip = true;
+                            break;
+                        }
+                    }
+                    if (skip) {
+                        this.particles.splice(i, 1);
+                        i--;
+                        continue;
+                    }
+                    let move = moves.popRandom();
+                    let _p = p.pos.Sum(move);
+                    if (!Calc.IsInside(_p.x, _p.y, this.cells)) {
+                        continue;
+                    }
+                    let cell = this.cells[_p.x][_p.y];
+                    cell.payload.isEmpty = false;
+                    p.payload.isEmpty = true;
+                    this.particles[i] = cell;
+                }
+                return false;
+            }
+        ];
+        this.particles = new Array();
+        this.Fill();
+    }
+    Fill() {
+        let chance = this.fillment / 100;
+        for (let x = 0; x < this.width; x++)
+            for (let y = 0; y < this.height; y++) {
+                if (Math.random() <= chance) {
+                    let cell = this.cells[x][y];
+                    this.particles.push(cell);
+                    cell.payload.isEmpty = false;
+                }
+            }
     }
 }
 //# sourceMappingURL=build.js.map

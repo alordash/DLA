@@ -23,7 +23,7 @@ function main() {
     const step = parseInt((<HTMLInputElement>document.getElementById("StepInput")).value);
     canvasManager = new CanvasManager(w, h, _p);
 
-    fieldDisplay = new FieldDisplay(canvasManager, w, h, step);
+    fieldDisplay = new DLA(canvasManager, w, h, step);
     UIControl.UpdateField();
     fieldDisplay.Display();
     console.log('main done');
