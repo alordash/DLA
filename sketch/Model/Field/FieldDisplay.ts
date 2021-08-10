@@ -18,33 +18,48 @@ class FieldDisplay extends Field implements IFieldDisplay {
         return Calc.Odd(q);
     }
 
-    constructor(canvasManager: CanvasManager, width: number = 0, height: number = 0, step: number = 1, payload: Payload = undefined) {
-        super(width, height, payload);
+    constructor(canvasManager: CanvasManager, width: number = 0, height: number = 0, step: number = 1) {
+        super(width, height);
         this.canvasManager = canvasManager;
         this._step = step;
     }
 
-    ResizeCanvas(width: number, height: number, step: number, clear = false, filler: Payload = undefined) {
-        this.Resize(width, height, clear, filler);
+    ResizeCanvas(width: number, height: number, step: number, clear = false) {
+        this.Resize(width, height, clear);
         this._step = step;
         this.canvasManager.Resize(this.width * this._step, this.height * this._step);
         this.Display();
     }
 
-    Palette(payload: Payload) {
+    Palette(state: States) {
         let p5 = this.canvasManager.p5;
-        let v = payload.isEmpty ? 0 : 255;
-        p5.fill(v).stroke(v);
+        let v: number;
+        switch (state) {
+            case States.empty:
+                v = 0;
+                p5.fill(v).stroke(v);
+                break;
+            case States.frozen:
+                p5.fill(0, 0, 255).stroke(0, 0, 255);
+                break;
+            case States.particle:
+                v = 255;
+                p5.fill(v).stroke(v);
+                break;
+
+            default:
+                break;
+        }
     }
 
     DrawCell(cell: Cell) {
-        this.Palette(cell.payload);
+        this.Palette(cell.state);
         this.canvasManager.p5.rect(cell.pos.x * this._step, cell.pos.y * this._step, this._step, this._step);
     }
 
-    MarkCell(p: Vec2, paylod: Payload) {
+    MarkCell(p: Vec2, state: States) {
         let cell = this.cells[p.x][p.y];
-        cell.payload = paylod;
+        cell.state = state;
         this.DrawCell(cell);
     }
 

@@ -3,10 +3,10 @@ interface IFieldDisplay extends IField {
     readonly step: number;
     Quantiz(v: number): number;
 
-    ResizeCanvas(width: number, height: number, step: number, clear: boolean, filler: Payload): void;
+    ResizeCanvas(width: number, height: number, step: number, clear: boolean): void;
 
-    Palette(payload: Payload): void;
+    Palette(state: States): void;
     DrawCell(cell: Cell): void;
-    MarkCell(p: Vec2, payload: Payload): void;
+    MarkCell(p: Vec2, state: States): void;
     Display(): void;
 }

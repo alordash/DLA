@@ -6,12 +6,12 @@ class Field implements IField {
     private _height: number;
     cells: Array<Array<Cell>>;
 
-    constructor(width: number, height: number, payload: Payload = undefined) {
+    constructor(width: number, height: number) {
         this.cells = new Array<Array<Cell>>();
-        this.Resize(width, height, true, payload);
+        this.Resize(width, height, true);
     }
 
-    Resize(width: number = this._width, height: number = this._height, clear: boolean = false, filler: Payload = undefined) {
+    Resize(width: number = this._width, height: number = this._height, clear: boolean = false, filler: States = undefined) {
         this._width = width;
         this._height = height;
 
@@ -50,7 +50,7 @@ class Field implements IField {
                 this.cells[x][y] = new Cell(new Vec2(x, y));
     }
 
-    static DefaultPredicate = (cell: Cell) => { return cell.payload.isEmpty; };
+    static DefaultPredicate = (cell: Cell) => { return cell.state == States.empty; };
 
     GetAvailableNeighbours(p: Vec2, count = -1, predicate = Field.DefaultPredicate) {
         let points = new Array<Cell>();
@@ -88,8 +88,8 @@ class Field implements IField {
         return points;
     }
 
-    MarkCell(p: Vec2, paylod: Payload) {
-        this.cells[p.x][p.y].payload = paylod;
+    MarkCell(p: Vec2, state: States) {
+        this.cells[p.x][p.y].state = state;
     }
 
     stage = 0;

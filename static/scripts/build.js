@@ -236,22 +236,6 @@ class Vec2 {
         return new Vec2(this.x * k, this.y * k);
     }
 }
-class Payload {
-    constructor(isEmpty = true, isFrozen = false) {
-        this.isEmpty = isEmpty;
-        this.isFrozen = isFrozen;
-    }
-    Copy() {
-        return new Payload(this.isEmpty);
-    }
-    static Random() {
-        return new Payload(Math.random() > 0.5 ? true : false);
-    }
-    static get Default() {
-        return Payload._Default.Copy();
-    }
-}
-Payload._Default = new Payload(true);
 class World {
     static GetSpawn(w, h, step) {
         let x = Calc.Odd(Calc.IntRand(1, Math.floor(w / step) - 1));
@@ -271,18 +255,24 @@ World.NeighboursLocs = [
     new Vec2(0, 1),
     new Vec2(1, 1)
 ];
+var States;
+(function (States) {
+    States[States["empty"] = 0] = "empty";
+    States[States["particle"] = 1] = "particle";
+    States[States["frozen"] = 2] = "frozen";
+})(States || (States = {}));
 class Cell {
-    constructor(pos, payload = Payload.Default) {
+    constructor(pos, state = States.empty) {
         this.pos = pos;
-        this.payload = payload;
+        this.state = state;
     }
 }
 class Field {
-    constructor(width, height, payload = undefined) {
+    constructor(width, height) {
         this.stage = 0;
         this.stageActions = [];
         this.cells = new Array();
-        this.Resize(width, height, true, payload);
+        this.Resize(width, height, true);
     }
     Resize(width = this._width, height = this._height, clear = false, filler = undefined) {
         this._width = width;
@@ -354,8 +344,8 @@ class Field {
         }
         return points;
     }
-    MarkCell(p, paylod) {
-        this.cells[p.x][p.y].payload = paylod;
+    MarkCell(p, state) {
+        this.cells[p.x][p.y].state = state;
     }
     Evolve() {
         if (this.stage >= this.stageActions.length) {
@@ -371,10 +361,10 @@ class Field {
         return false;
     }
 }
-Field.DefaultPredicate = (cell) => { return cell.payload.isEmpty; };
+Field.DefaultPredicate = (cell) => { return cell.state == States.empty; };
 class FieldDisplay extends Field {
-    constructor(canvasManager, width = 0, height = 0, step = 1, payload = undefined) {
-        super(width, height, payload);
+    constructor(canvasManager, width = 0, height = 0, step = 1) {
+        super(width, height);
         this.canvasManager = canvasManager;
         this._step = step;
     }
@@ -389,24 +379,38 @@ class FieldDisplay extends Field {
         let q = Math.round(v / this._step);
         return Calc.Odd(q);
     }
-    ResizeCanvas(width, height, step, clear = false, filler = undefined) {
-        this.Resize(width, height, clear, filler);
+    ResizeCanvas(width, height, step, clear = false) {
+        this.Resize(width, height, clear);
         this._step = step;
         this.canvasManager.Resize(this.width * this._step, this.height * this._step);
         this.Display();
     }
-    Palette(payload) {
+    Palette(state) {
         let p5 = this.canvasManager.p5;
-        let v = payload.isEmpty ? 0 : 255;
-        p5.fill(v).stroke(v);
+        let v;
+        switch (state) {
+            case States.empty:
+                v = 0;
+                p5.fill(v).stroke(v);
+                break;
+            case States.frozen:
+                p5.fill(0, 0, 255).stroke(0, 0, 255);
+                break;
+            case States.particle:
+                v = 255;
+                p5.fill(v).stroke(v);
+                break;
+            default:
+                break;
+        }
     }
     DrawCell(cell) {
-        this.Palette(cell.payload);
+        this.Palette(cell.state);
         this.canvasManager.p5.rect(cell.pos.x * this._step, cell.pos.y * this._step, this._step, this._step);
     }
-    MarkCell(p, paylod) {
+    MarkCell(p, state) {
         let cell = this.cells[p.x][p.y];
-        cell.payload = paylod;
+        cell.state = state;
         this.DrawCell(cell);
     }
     Display() {
@@ -418,8 +422,8 @@ class FieldDisplay extends Field {
     }
 }
 class DLA extends FieldDisplay {
-    constructor(canvasManager, width = 0, height = 0, step = 1, payload = undefined) {
-        super(canvasManager, width, height, step, payload);
+    constructor(canvasManager, width = 0, height = 0, step = 1) {
+        super(canvasManager, width, height, step);
         this.fillment = 10;
         this.stageActions = [
             () => {
@@ -433,8 +437,8 @@ class DLA extends FieldDisplay {
                         if (!Calc.IsInside(_p.x, _p.y, this.cells))
                             continue;
                         let cell = this.cells[_p.x][_p.y];
-                        if (!cell.payload.isEmpty) {
-                            p.payload.isFrozen = true;
+                        if (cell.state == States.frozen) {
+                            p.state = States.frozen;
                             skip = true;
                             break;
                         }
@@ -450,8 +454,8 @@ class DLA extends FieldDisplay {
                         continue;
                     }
                     let cell = this.cells[_p.x][_p.y];
-                    cell.payload.isEmpty = false;
-                    p.payload.isEmpty = true;
+                    cell.state = States.particle;
+                    p.state = States.empty;
                     this.particles[i] = cell;
                 }
                 return false;
@@ -467,7 +471,7 @@ class DLA extends FieldDisplay {
                 if (Math.random() <= chance) {
                     let cell = this.cells[x][y];
                     this.particles.push(cell);
-                    cell.payload.isEmpty = false;
+                    cell.state = States.particle;
                 }
             }
     }

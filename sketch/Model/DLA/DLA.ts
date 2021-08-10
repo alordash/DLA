@@ -11,12 +11,12 @@ class DLA extends FieldDisplay {
                 if (Math.random() <= chance) {
                     let cell = this.cells[x][y];
                     this.particles.push(cell);
-                    cell.payload.isEmpty = false;
+                    cell.state = States.particle;
                 }
             }
     }
-    constructor(canvasManager: CanvasManager, width: number = 0, height: number = 0, step: number = 1, payload: Payload = undefined) {
-        super(canvasManager, width, height, step, payload);
+    constructor(canvasManager: CanvasManager, width: number = 0, height: number = 0, step: number = 1) {
+        super(canvasManager, width, height, step);
         this.particles = new Array<Cell>();
         this.Fill();
     }
@@ -32,8 +32,8 @@ class DLA extends FieldDisplay {
                     if (!Calc.IsInside(_p.x, _p.y, this.cells))
                         continue;
                     let cell = this.cells[_p.x][_p.y];
-                    if (!cell.payload.isEmpty) {
-                        p.payload.isFrozen = true;
+                    if (cell.state == States.frozen) {
+                        p.state = States.frozen;
                         skip = true;
                         break;
                     }
@@ -49,8 +49,8 @@ class DLA extends FieldDisplay {
                     continue;
                 }
                 let cell = this.cells[_p.x][_p.y];
-                cell.payload.isEmpty = false;
-                p.payload.isEmpty = true;
+                cell.state = States.particle;
+                p.state = States.empty;
                 this.particles[i] = cell;
             }
             return false;
