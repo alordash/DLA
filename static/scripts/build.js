@@ -65,7 +65,6 @@ class UIControl {
         UIControl.CreateOptions();
     }
     static UIUpdate() {
-        fieldDisplay.Display();
         let stageDiv = document.getElementById("StageDiv");
         stageDiv.innerHTML = `<b>Stage: ${fieldDisplay.stage}</b>`;
     }
@@ -406,7 +405,7 @@ class FieldDisplay extends Field {
     }
     DrawCell(cell) {
         this.Palette(cell.state);
-        this.canvasManager.p5.rect(cell.pos.x * this._step, cell.pos.y * this._step, this._step, this._step);
+        this.canvasManager.p5.rect(cell.pos.x * this._step + 1, cell.pos.y * this._step + 1, this._step - 1, this._step - 1);
     }
     MarkCell(p, state) {
         let cell = this.cells[p.x][p.y];
@@ -424,7 +423,7 @@ class FieldDisplay extends Field {
 class DLA extends FieldDisplay {
     constructor(canvasManager, width = 0, height = 0, step = 1) {
         super(canvasManager, width, height, step);
-        this.fillment = 10;
+        this.fillment = 30;
         this.stageActions = [
             () => {
                 for (let i = 0; i < this.particles.length; i++) {
@@ -440,6 +439,7 @@ class DLA extends FieldDisplay {
                         if (cell.state == States.frozen) {
                             p.state = States.frozen;
                             skip = true;
+                            this.DrawCell(p);
                             break;
                         }
                     }
@@ -453,10 +453,9 @@ class DLA extends FieldDisplay {
                     if (!Calc.IsInside(_p.x, _p.y, this.cells)) {
                         continue;
                     }
-                    let cell = this.cells[_p.x][_p.y];
-                    cell.state = States.particle;
-                    p.state = States.empty;
-                    this.particles[i] = cell;
+                    this.MarkCell(_p, States.particle);
+                    this.MarkCell(p.pos, States.empty);
+                    this.particles[i] = this.cells[_p.x][_p.y];
                 }
                 return false;
             }

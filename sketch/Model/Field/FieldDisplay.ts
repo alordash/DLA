@@ -54,7 +54,7 @@ class FieldDisplay extends Field implements IFieldDisplay {
 
     DrawCell(cell: Cell) {
         this.Palette(cell.state);
-        this.canvasManager.p5.rect(cell.pos.x * this._step, cell.pos.y * this._step, this._step, this._step);
+        this.canvasManager.p5.rect(cell.pos.x * this._step + 1, cell.pos.y * this._step + 1, this._step - 1, this._step - 1);
     }
 
     MarkCell(p: Vec2, state: States) {

@@ -2,7 +2,7 @@
 
 class DLA extends FieldDisplay {
     particles: Array<Cell>;
-    fillment = 10;
+    fillment = 30;
 
     Fill() {
         let chance = this.fillment / 100;
@@ -35,6 +35,7 @@ class DLA extends FieldDisplay {
                     if (cell.state == States.frozen) {
                         p.state = States.frozen;
                         skip = true;
+                        this.DrawCell(p);
                         break;
                     }
                 }
@@ -48,10 +49,9 @@ class DLA extends FieldDisplay {
                 if (!Calc.IsInside(_p.x, _p.y, this.cells)) {
                     continue;
                 }
-                let cell = this.cells[_p.x][_p.y];
-                cell.state = States.particle;
-                p.state = States.empty;
-                this.particles[i] = cell;
+                this.MarkCell(_p, States.particle);
+                this.MarkCell(p.pos, States.empty);
+                this.particles[i] = this.cells[_p.x][_p.y];
             }
             return false;
         }
