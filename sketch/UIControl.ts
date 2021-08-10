@@ -13,6 +13,7 @@ abstract class UIControl {
     }
 
     static UIUpdate() {
+        fieldDisplay.Display();
         let stageDiv = document.getElementById("StageDiv");
         stageDiv.innerHTML = `<b>Stage: ${fieldDisplay.stage}</b>`;
     }

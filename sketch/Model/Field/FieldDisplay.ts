@@ -31,19 +31,15 @@ class FieldDisplay extends Field implements IFieldDisplay {
 
     Palette(payload: Payload) {
         let p5 = this.canvasManager.p5;
-        if (payload.isVisited) {
-            p5.fill(0, 0, 255).stroke(0, 0, 255);
-        } else {
-            let v = payload.isWall ? 0 : 255;
-            p5.fill(v).stroke(v);
-        }
+        let v = payload.isEmpty ? 0 : 255;
+        p5.fill(v).stroke(v);
     }
 
     DrawCell(cell: Cell) {
         this.Palette(cell.payload);
         this.canvasManager.p5.rect(cell.pos.x * this._step, cell.pos.y * this._step, this._step, this._step);
     }
-    
+
     MarkCell(p: Vec2, paylod: Payload) {
         let cell = this.cells[p.x][p.y];
         cell.payload = paylod;

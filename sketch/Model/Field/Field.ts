@@ -50,7 +50,7 @@ class Field implements IField {
                 this.cells[x][y] = new Cell(new Vec2(x, y));
     }
 
-    static DefaultPredicate = (cell: Cell) => { return cell.payload.isWall; };
+    static DefaultPredicate = (cell: Cell) => { return cell.payload.isEmpty; };
 
     GetAvailableNeighbours(p: Vec2, count = -1, predicate = Field.DefaultPredicate) {
         let points = new Array<Cell>();
@@ -95,6 +95,9 @@ class Field implements IField {
     stage = 0;
     stageActions: Array<() => boolean> = [
         () => {
+            for (let cells of this.cells)
+                for (let cell of cells)
+                    cell.payload = Payload.Random();
             return false;
         }
     ];

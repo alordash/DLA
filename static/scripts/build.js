@@ -65,6 +65,7 @@ class UIControl {
         UIControl.CreateOptions();
     }
     static UIUpdate() {
+        fieldDisplay.Display();
         let stageDiv = document.getElementById("StageDiv");
         stageDiv.innerHTML = `<b>Stage: ${fieldDisplay.stage}</b>`;
     }
@@ -235,6 +236,21 @@ class Vec2 {
         return new Vec2(this.x * k, this.y * k);
     }
 }
+class Payload {
+    constructor(isEmpty = true) {
+        this.isEmpty = isEmpty;
+    }
+    Copy() {
+        return new Payload(this.isEmpty);
+    }
+    static Random() {
+        return new Payload(Math.random() > 0.5 ? true : false);
+    }
+    static get Default() {
+        return Payload._Default.Copy();
+    }
+}
+Payload._Default = new Payload(true);
 class World {
     static GetSpawn(w, h, step) {
         let x = Calc.Odd(Calc.IntRand(1, Math.floor(w / step) - 1));
@@ -254,19 +270,6 @@ World.NeighboursLocs = [
     new Vec2(0, 1),
     new Vec2(1, 1)
 ];
-class Payload {
-    constructor(isWall = true, isVisited = false) {
-        this.isWall = isWall;
-        this.isVisited = isVisited;
-    }
-    Copy() {
-        return new Payload(this.isWall);
-    }
-    static get Default() {
-        return this._Default.Copy();
-    }
-}
-Payload._Default = new Payload(true);
 class Cell {
     constructor(pos, payload = Payload.Default) {
         this.pos = pos;
@@ -276,7 +279,14 @@ class Cell {
 class Field {
     constructor(width, height, payload = undefined) {
         this.stage = 0;
-        this.stageActions = [];
+        this.stageActions = [
+            () => {
+                for (let cells of this.cells)
+                    for (let cell of cells)
+                        cell.payload = Payload.Random();
+                return false;
+            }
+        ];
         this.cells = new Array();
         this.Resize(width, height, true, payload);
     }
@@ -367,7 +377,7 @@ class Field {
         return false;
     }
 }
-Field.DefaultPredicate = (cell) => { return cell.payload.isWall; };
+Field.DefaultPredicate = (cell) => { return cell.payload.isEmpty; };
 class FieldDisplay extends Field {
     constructor(canvasManager, width = 0, height = 0, step = 1, payload = undefined) {
         super(width, height, payload);
@@ -393,13 +403,8 @@ class FieldDisplay extends Field {
     }
     Palette(payload) {
         let p5 = this.canvasManager.p5;
-        if (payload.isVisited) {
-            p5.fill(0, 0, 255).stroke(0, 0, 255);
-        }
-        else {
-            let v = payload.isWall ? 0 : 255;
-            p5.fill(v).stroke(v);
-        }
+        let v = payload.isEmpty ? 0 : 255;
+        p5.fill(v).stroke(v);
     }
     DrawCell(cell) {
         this.Palette(cell.payload);

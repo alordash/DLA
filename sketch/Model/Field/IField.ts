@@ -1,6 +1,6 @@
 interface IField {
-    readonly width: number;
-    readonly height: number;
+    width: number;
+    height: number;
 
     cells: Array<Array<Cell>>;
 
