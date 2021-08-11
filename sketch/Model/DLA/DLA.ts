@@ -4,14 +4,29 @@ class DLA extends FieldDisplay {
     particles: Array<Cell>;
     fillment = 10;
 
-    Fill() {
+    Fill(clear = false) {
+        if(clear) {
+            this.particles = new Array<Cell>();
+        }
         let chance = this.fillment / 100;
-        for (let x = 0; x < this.size.x; x++)
+        let max = this.size.x * this.size.y * chance;
+        const dif = this.particles.length - max;
+        for(let i = 0; i < dif; i++) {
+            let index = Calc.IntRand(0, this.particles.length - 1);
+            let cell = this.particles.splice(index, 1)[0];
+            cell.state = States.empty;
+        }
+        let end = false;
+        for (let x = 0; !end && x < this.size.x; x++)
             for (let y = 0; y < this.size.y; y++) {
                 if (Math.random() > chance) {
                     continue;
                 }
                 this.particles.push(new Cell(new Vec2(x, y), States.particle));
+                if(this.particles.length >= max) {
+                    end = true;
+                    break;
+                }
             }
         this.cells.push(...this.particles);
     }

@@ -61,14 +61,17 @@ class CanvasManager {
         this.height = height;
         this.p5 = p5;
     }
-    Resize(width = this.width, height = this.height) {
-        this.width = width;
-        this.height = height;
-        this.p5.resizeCanvas(this.width, this.height);
+    Clear() {
         this.p5.background(0);
         this.p5.fill(255);
         this.p5.stroke(0);
         this.p5.strokeWeight(2);
+    }
+    Resize(width = this.width, height = this.height) {
+        this.width = width;
+        this.height = height;
+        this.p5.resizeCanvas(this.width, this.height);
+        this.Clear();
     }
 }
 let playTimer;
@@ -110,6 +113,8 @@ class UIControl {
         let height = parseInt(document.getElementById("HeightInput").value);
         let step = parseInt(document.getElementById("StepInput").value);
         fieldDisplay.ResizeCanvas(width, height, step);
+        fieldDisplay.Fill();
+        fieldDisplay.Display();
     }
     static InitInputs() {
         document.getElementById("WidthInput").onchange = document.getElementById("HeightInput").onchange = document.getElementById("StepInput").onchange = ev => {
@@ -402,7 +407,6 @@ class FieldDisplay extends Field {
         this.size.y = height;
         this._step = step;
         this.canvasManager.Resize(this.size.x * this._step, this.size.y * this._step);
-        this.Display();
     }
     Palette(state) {
         let p5 = this.canvasManager.p5;
@@ -496,14 +500,29 @@ class DLA extends FieldDisplay {
         this.particles = new Array();
         this.Fill();
     }
-    Fill() {
+    Fill(clear = false) {
+        if (clear) {
+            this.particles = new Array();
+        }
         let chance = this.fillment / 100;
-        for (let x = 0; x < this.size.x; x++)
+        let max = this.size.x * this.size.y * chance;
+        const dif = this.particles.length - max;
+        for (let i = 0; i < dif; i++) {
+            let index = Calc.IntRand(0, this.particles.length - 1);
+            let cell = this.particles.splice(index, 1)[0];
+            cell.state = States.empty;
+        }
+        let end = false;
+        for (let x = 0; !end && x < this.size.x; x++)
             for (let y = 0; y < this.size.y; y++) {
                 if (Math.random() > chance) {
                     continue;
                 }
                 this.particles.push(new Cell(new Vec2(x, y), States.particle));
+                if (this.particles.length >= max) {
+                    end = true;
+                    break;
+                }
             }
         this.cells.push(...this.particles);
     }

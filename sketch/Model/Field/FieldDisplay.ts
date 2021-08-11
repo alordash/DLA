@@ -29,7 +29,6 @@ class FieldDisplay extends Field implements IFieldDisplay {
         this.size.y = height;
         this._step = step;
         this.canvasManager.Resize(this.size.x * this._step, this.size.y * this._step);
-        this.Display();
     }
 
     Palette(state: States) {

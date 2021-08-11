@@ -44,6 +44,8 @@ abstract class UIControl {
         let height = parseInt((<HTMLInputElement>document.getElementById("HeightInput")).value);
         let step = parseInt((<HTMLInputElement>document.getElementById("StepInput")).value);
         fieldDisplay.ResizeCanvas(width, height, step);
+        (<DLA>fieldDisplay).Fill();
+        fieldDisplay.Display();
     }
 
     static InitInputs() {
