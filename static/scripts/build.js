@@ -121,6 +121,8 @@ class UIControl {
         };
         document.getElementById("EvolveButton").onclick = () => { UIControl.UIEvolve(); };
         document.getElementById("ResetButton").onclick = ev => {
+            fieldDisplay.Clear();
+            fieldDisplay.canvasManager.Clear();
             fieldDisplay.Fill(true);
             fieldDisplay.Display();
         };
@@ -469,7 +471,7 @@ class DLA extends FieldDisplay {
                         p.pos = Calc.RandomPoint(this.size);
                         continue;
                     }
-                    let moves = World.MoveDirections.slice();
+                    let moves = World.NeighboursLocs.slice();
                     Calc.Shuffle(moves);
                     let skip = false;
                     for (let move of moves) {
