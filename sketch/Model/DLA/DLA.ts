@@ -2,7 +2,7 @@
 
 class DLA extends FieldDisplay {
     particles: Array<Cell>;
-    fillment = 10;
+    $fillment = 10;
 
     Fill(clear = false) {
         if (clear) {
@@ -10,7 +10,7 @@ class DLA extends FieldDisplay {
                 cell.state = States.empty;
             this.particles = new Array<Cell>();
         }
-        let chance = this.fillment / 100;
+        let chance = this.$fillment / 100;
         let max = this.size.x * this.size.y * chance;
         const dif = this.particles.length - max;
         for (let i = 0; i < dif; i++) {

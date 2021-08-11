@@ -9,7 +9,6 @@ abstract class UIControl {
     static Init() {
         UIControl.InitInputs();
         UIControl.InitTimeRange();
-        UIControl.CreateOptions();
     }
 
     static UIUpdate() {
@@ -58,7 +57,6 @@ abstract class UIControl {
         document.getElementById("ResetButton").onclick = ev => {
             (<DLA>fieldDisplay).Fill(true);
             fieldDisplay.Display();
-            //            fieldDisplay.Reset();
         };
     }
 
@@ -162,26 +160,5 @@ abstract class UIControl {
                 UIControl.CreateNumberParameter(fieldDisplay, key);
             }
         }
-    }
-
-    static CreateOptions() {
-        /*
-        let list = document.createElement('select');
-        list.className = 'options';
-        for (let Algorithm of Algorithms_List) {
-            let option = document.createElement('option');
-            option.innerHTML = Algorithm.name;
-            list.appendChild(option);
-        }
-
-        list.onchange = () => {
-            let Algorithm = Algorithms_List.find((x) => { return x.name == list.value; });
-            console.log('Algorithm.name :>> ', Algorithm.name);
-            fieldDisplay = new Algorithm(canvasManager, parseInt((<HTMLInputElement>document.getElementById("StepInput")).value));
-            UIControl.CreateParametersPanel(fieldDisplay);
-        }
-
-        let stageDiv = document.getElementById('StageDiv');
-        document.body.insertBefore(list, stageDiv);*/
     }
 }

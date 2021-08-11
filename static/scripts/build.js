@@ -83,7 +83,6 @@ class UIControl {
     static Init() {
         UIControl.InitInputs();
         UIControl.InitTimeRange();
-        UIControl.CreateOptions();
     }
     static UIUpdate() {
         fieldDisplay.Display();
@@ -186,8 +185,6 @@ class UIControl {
                 UIControl.CreateNumberParameter(fieldDisplay, key);
             }
         }
-    }
-    static CreateOptions() {
     }
 }
 UIControl.TimeRangeClick = () => {
@@ -457,7 +454,7 @@ class FieldDisplay extends Field {
 class DLA extends FieldDisplay {
     constructor(canvasManager, width = 0, height = 0, step = 1) {
         super(canvasManager, width, height, step);
-        this.fillment = 10;
+        this.$fillment = 10;
         this.stageActions = [
             () => {
                 for (let i = 0; i < this.particles.length; i++) {
@@ -508,7 +505,7 @@ class DLA extends FieldDisplay {
                 cell.state = States.empty;
             this.particles = new Array();
         }
-        let chance = this.fillment / 100;
+        let chance = this.$fillment / 100;
         let max = this.size.x * this.size.y * chance;
         const dif = this.particles.length - max;
         for (let i = 0; i < dif; i++) {
