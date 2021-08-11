@@ -463,7 +463,7 @@ class DLA extends FieldDisplay {
     constructor(canvasManager, width = 0, height = 0, step = 1) {
         super(canvasManager, width, height, step);
         this.$fillment = 10;
-        this.$stickines = 0.25;
+        this.$stickines = 0.9;
         this.stageActions = [
             () => {
                 for (let i = 0; i < this.particles.length; i++) {
