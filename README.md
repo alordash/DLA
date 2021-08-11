@@ -1,6 +1,7 @@
 # Diffusion Limited Aggregation
 
 Runtime [DLA](http://paulbourke.net/fractals/dla/) process visualizer.  
+Mouse click to create attractor.
 ### [Available here (open link)](https://alordash.github.io/DLA/static/index.html)
 
 ![Demo1](previews/ls1.png)
