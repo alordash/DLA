@@ -14,8 +14,7 @@ class FieldDisplay extends Field implements IFieldDisplay {
     }
 
     Quantiz(v: number) {
-        let q = Math.round(v / this._step);
-        return Calc.Odd(q);
+        return Math.round(v / this._step);
     }
 
     constructor(canvasManager: CanvasManager, width: number = 0, height: number = 0, step: number = 1) {

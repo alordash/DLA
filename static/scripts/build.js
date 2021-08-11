@@ -124,6 +124,13 @@ class UIControl {
             fieldDisplay.Fill(true);
             fieldDisplay.Display();
         };
+        document.getElementById("defaultCanvas0").onclick = ev => {
+            let x = fieldDisplay.Quantiz(ev.offsetX);
+            let y = fieldDisplay.Quantiz(ev.offsetY);
+            fieldDisplay.setCell(States.frozen, x, y);
+            console.log(`Created frozen point at ${x}, ${y}`);
+            fieldDisplay.Display();
+        };
     }
     static InitTimeRange() {
         let timeCheckbox = document.getElementById('TimeCheckbox');
@@ -398,8 +405,7 @@ class FieldDisplay extends Field {
         this.canvasManager.Resize();
     }
     Quantiz(v) {
-        let q = Math.round(v / this._step);
-        return Calc.Odd(q);
+        return Math.round(v / this._step);
     }
     ResizeCanvas(width, height, step) {
         this.size.x = width;

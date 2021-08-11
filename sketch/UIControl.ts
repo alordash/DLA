@@ -13,8 +13,6 @@ abstract class UIControl {
 
     static UIUpdate() {
         fieldDisplay.Display();
-        //        let stageDiv = document.getElementById("StageDiv");
-        //        stageDiv.innerHTML = `<b>Stage: ${fieldDisplay.stage}</b>`;
     }
 
     static UIEvolve(update = true) {
@@ -58,6 +56,14 @@ abstract class UIControl {
             (<DLA>fieldDisplay).Fill(true);
             fieldDisplay.Display();
         };
+
+        document.getElementById("defaultCanvas0").onclick = ev => {
+            let x = fieldDisplay.Quantiz(ev.offsetX);
+            let y = fieldDisplay.Quantiz(ev.offsetY);
+            fieldDisplay.setCell(States.frozen, x, y);
+            console.log(`Created frozen point at ${x}, ${y}`);
+            fieldDisplay.Display();
+        }
     }
 
     static TimeRangeClick = () => {
