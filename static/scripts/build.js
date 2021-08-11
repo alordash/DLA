@@ -1,9 +1,16 @@
 class Calc {
-    static IsInside(x, y, a) {
-        return a.length > 0 && 0 <= x && x < a.length && 0 <= y && y < a[0].length;
-    }
-    static IsPointInside(p, a) {
-        return this.IsInside(p.x, p.y, a);
+    static IsInside(_x, _y, w = 0, h = 0) {
+        let p;
+        let size;
+        if (_x instanceof Vec2) {
+            p = _x;
+            size = _y;
+        }
+        else {
+            p = new Vec2(_x, _y);
+            size = new Vec2(w, h);
+        }
+        return 0 <= p.x && p.x < size.x && 0 <= p.y && p.y < size.y;
     }
     static Random(min, max) {
         if (min > max) {
@@ -29,6 +36,17 @@ class Calc {
             return --v;
         }
         return v;
+    }
+    static toVec2(_x, _y) {
+        if (_x instanceof Vec2) {
+            return _x;
+        }
+        else {
+            return new Vec2(_x, _y);
+        }
+    }
+    static RandomPoint(size) {
+        return new Vec2(Calc.IntRand(0, size.x - 1), Calc.IntRand(0, size.y - 1));
     }
 }
 Array.prototype.popRandom = function () {
@@ -65,8 +83,7 @@ class UIControl {
         UIControl.CreateOptions();
     }
     static UIUpdate() {
-        let stageDiv = document.getElementById("StageDiv");
-        stageDiv.innerHTML = `<b>Stage: ${fieldDisplay.stage}</b>`;
+        fieldDisplay.Display();
     }
     static UIEvolve(update = true) {
         let stageDiv = document.getElementById("StageDiv");
@@ -80,7 +97,7 @@ class UIControl {
                     UIControl.TimeRangeClick();
                     UIControl.TimeRangeClick();
                 }
-            }, Math.min(4000, Math.max(500, fieldDisplay.cells.length * fieldDisplay.cells[0].length / 2.178)));
+            }, Math.min(4000, Math.max(500, fieldDisplay.size.x * fieldDisplay.size.y / 2.178)));
             res = true;
         }
         if (update) {
@@ -270,44 +287,44 @@ class Field {
     constructor(width, height) {
         this.stage = 0;
         this.stageActions = [];
+        this.size = new Vec2(width, height);
+        this.grid = new Array();
         this.cells = new Array();
-        this.Resize(width, height, true);
     }
-    Resize(width = this._width, height = this._height, clear = false, filler = undefined) {
-        this._width = width;
-        this._height = height;
-        let newCells = new Array(this._width);
-        for (let x = 0; x < this._width; x++) {
-            newCells[x] = new Array(this._height);
-            for (let y = 0; y < this._height; y++) {
-                if (!clear && Calc.IsInside(x, y, this.cells)) {
-                    newCells[x][y] = this.cells[x][y];
-                }
-                else {
-                    newCells[x][y] = new Cell(new Vec2(x, y));
-                }
-            }
+    getCell(_x, _y) {
+        const p = Calc.toVec2(_x, _y);
+        if (this.grid[p.x] == undefined)
+            return undefined;
+        return this.grid[p.x][p.y];
+    }
+    setCell(state_cell, _x, _y) {
+        if (state_cell instanceof Cell) {
+            const p = state_cell.pos;
+            if (this.grid[p.x] == undefined)
+                this.grid[p.x] = new Array();
+            this.grid[p.x][p.y] = state_cell;
+            return state_cell;
         }
-        this.cells = newCells;
-    }
-    get width() {
-        return this._width;
-    }
-    set width(v) {
-        this._width = v;
-        this.Resize();
-    }
-    get height() {
-        return this._height;
-    }
-    set height(v) {
-        this._height = v;
-        this.Resize();
+        const state = state_cell;
+        const p = Calc.toVec2(_x, _y);
+        if (this.grid[p.x] == undefined) {
+            this.grid[p.x] = new Array();
+            let cell = this.grid[p.x][p.y] = new Cell(p, state);
+            this.cells.push(cell);
+            return cell;
+        }
+        let cell = this.grid[p.x][p.y];
+        if (cell == undefined) {
+            this.grid[p.x][p.y] = cell = new Cell(p, state);
+            this.cells.push(cell);
+            return cell;
+        }
+        cell.state = state;
+        return cell;
     }
     Clear() {
-        for (let x = 0; x < this._width; x++)
-            for (let y = 0; y < this._height; y++)
-                this.cells[x][y] = new Cell(new Vec2(x, y));
+        this.cells = new Array();
+        this.grid = new Array();
     }
     GetAvailableNeighbours(p, count = -1, predicate = Field.DefaultPredicate) {
         let points = new Array();
@@ -319,9 +336,9 @@ class Field {
         for (const i of order) {
             const direction = World.MoveDirections[i];
             let newPoint = p.Sum(direction);
-            if (!Calc.IsPointInside(newPoint, this.cells))
+            if (!Calc.IsInside(newPoint, this.size))
                 continue;
-            let cell = this.cells[newPoint.x][newPoint.y];
+            let cell = this.grid[newPoint.x][newPoint.y];
             if (predicate(cell)) {
                 points.push(cell);
                 if (count != -1 && points.length >= count) {
@@ -333,9 +350,9 @@ class Field {
     }
     GetAvailableCells(predicate = Field.DefaultPredicate) {
         let points = new Array();
-        for (let x = 1; x < this._width; x += 2) {
-            for (let y = 1; y < this._height; y += 2) {
-                let cell = this.cells[x][y];
+        for (let x = 1; x < this.size.x; x += 2) {
+            for (let y = 1; y < this.size.y; y += 2) {
+                let cell = this.grid[x][y];
                 if (predicate(cell)) {
                     points.push(cell);
                 }
@@ -344,7 +361,9 @@ class Field {
         return points;
     }
     MarkCell(p, state) {
-        this.cells[p.x][p.y].state = state;
+        if (this.grid[p.x] == undefined)
+            this.grid[p.x] = new Array();
+        this.grid[p.x][p.y].state = state;
     }
     Evolve() {
         if (this.stage >= this.stageActions.length) {
@@ -378,10 +397,11 @@ class FieldDisplay extends Field {
         let q = Math.round(v / this._step);
         return Calc.Odd(q);
     }
-    ResizeCanvas(width, height, step, clear = false) {
-        this.Resize(width, height, clear);
+    ResizeCanvas(width, height, step) {
+        this.size.x = width;
+        this.size.y = height;
         this._step = step;
-        this.canvasManager.Resize(this.width * this._step, this.height * this._step);
+        this.canvasManager.Resize(this.size.x * this._step, this.size.y * this._step);
         this.Display();
     }
     Palette(state) {
@@ -403,59 +423,72 @@ class FieldDisplay extends Field {
                 break;
         }
     }
-    DrawCell(cell) {
-        this.Palette(cell.state);
-        this.canvasManager.p5.rect(cell.pos.x * this._step + 1, cell.pos.y * this._step + 1, this._step - 1, this._step - 1);
+    DrawCell(state_cell, _x, _y) {
+        let p;
+        let state;
+        if (state_cell instanceof Cell) {
+            p = state_cell.pos;
+            state = state_cell.state;
+        }
+        else {
+            p = Calc.toVec2(_x, _y);
+            state = state_cell;
+        }
+        this.Palette(state);
+        this.canvasManager.p5.rect(p.x * this._step + 1, p.y * this._step + 1, this._step - 1, this._step - 1);
     }
     MarkCell(p, state) {
-        let cell = this.cells[p.x][p.y];
+        let cell = this.getCell(p);
         cell.state = state;
         this.DrawCell(cell);
     }
     Display() {
-        for (let arr of this.cells) {
-            for (let cell of arr) {
-                this.DrawCell(cell);
-            }
+        for (let cell of this.cells) {
+            this.DrawCell(cell);
         }
     }
 }
 class DLA extends FieldDisplay {
     constructor(canvasManager, width = 0, height = 0, step = 1) {
         super(canvasManager, width, height, step);
-        this.fillment = 30;
+        this.fillment = 10;
         this.stageActions = [
             () => {
                 for (let i = 0; i < this.particles.length; i++) {
                     let p = this.particles[i];
+                    if (!Calc.IsInside(p.pos, this.size)) {
+                        p.pos = Calc.RandomPoint(this.size);
+                        continue;
+                    }
                     let moves = World.MoveDirections.slice();
                     Calc.Shuffle(moves);
                     let skip = false;
                     for (let move of moves) {
                         let _p = p.pos.Sum(move);
-                        if (!Calc.IsInside(_p.x, _p.y, this.cells))
+                        if (!Calc.IsInside(_p, this.size))
                             continue;
-                        let cell = this.cells[_p.x][_p.y];
+                        let cell = this.getCell(_p);
+                        if (cell == undefined)
+                            continue;
                         if (cell.state == States.frozen) {
                             p.state = States.frozen;
                             skip = true;
-                            this.DrawCell(p);
                             break;
                         }
                     }
                     if (skip) {
                         this.particles.splice(i, 1);
                         i--;
+                        this.setCell(p);
                         continue;
                     }
                     let move = moves.popRandom();
                     let _p = p.pos.Sum(move);
-                    if (!Calc.IsInside(_p.x, _p.y, this.cells)) {
+                    if (!Calc.IsInside(_p, this.size)) {
                         continue;
                     }
-                    this.MarkCell(_p, States.particle);
-                    this.MarkCell(p.pos, States.empty);
-                    this.particles[i] = this.cells[_p.x][_p.y];
+                    this.DrawCell(States.empty, p.pos);
+                    p.pos = _p;
                 }
                 return false;
             }
@@ -465,14 +498,14 @@ class DLA extends FieldDisplay {
     }
     Fill() {
         let chance = this.fillment / 100;
-        for (let x = 0; x < this.width; x++)
-            for (let y = 0; y < this.height; y++) {
-                if (Math.random() <= chance) {
-                    let cell = this.cells[x][y];
-                    this.particles.push(cell);
-                    cell.state = States.particle;
+        for (let x = 0; x < this.size.x; x++)
+            for (let y = 0; y < this.size.y; y++) {
+                if (Math.random() > chance) {
+                    continue;
                 }
+                this.particles.push(new Cell(new Vec2(x, y), States.particle));
             }
+        this.cells.push(...this.particles);
     }
 }
 //# sourceMappingURL=build.js.map

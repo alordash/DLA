@@ -24,10 +24,11 @@ class FieldDisplay extends Field implements IFieldDisplay {
         this._step = step;
     }
 
-    ResizeCanvas(width: number, height: number, step: number, clear = false) {
-        this.Resize(width, height, clear);
+    ResizeCanvas(width: number, height: number, step: number) {
+        this.size.x = width;
+        this.size.y = height;
         this._step = step;
-        this.canvasManager.Resize(this.width * this._step, this.height * this._step);
+        this.canvasManager.Resize(this.size.x * this._step, this.size.y * this._step);
         this.Display();
     }
 
@@ -52,22 +53,29 @@ class FieldDisplay extends Field implements IFieldDisplay {
         }
     }
 
-    DrawCell(cell: Cell) {
-        this.Palette(cell.state);
-        this.canvasManager.p5.rect(cell.pos.x * this._step + 1, cell.pos.y * this._step + 1, this._step - 1, this._step - 1);
+    DrawCell(state_cell: States | Cell, _x?: number | Vec2, _y?: number) {
+        let p: Vec2;
+        let state: States;
+        if (state_cell instanceof Cell) {
+            p = state_cell.pos;
+            state = state_cell.state;
+        } else {
+            p = Calc.toVec2(_x, _y);
+            state = state_cell;
+        }
+        this.Palette(state);
+        this.canvasManager.p5.rect(p.x * this._step + 1, p.y * this._step + 1, this._step - 1, this._step - 1);
     }
 
     MarkCell(p: Vec2, state: States) {
-        let cell = this.cells[p.x][p.y];
+        let cell = this.getCell(p);
         cell.state = state;
         this.DrawCell(cell);
     }
 
     Display() {
-        for (let arr of this.cells) {
-            for (let cell of arr) {
-                this.DrawCell(cell);
-            }
+        for (let cell of this.cells) {
+            this.DrawCell(cell);
         }
     }
 }

@@ -1,10 +1,9 @@
 interface IField {
-    width: number;
-    height: number;
+    size: Vec2;
 
-    cells: Array<Array<Cell>>;
+    getCell(_x: number | Vec2, _y?: number): Cell;
+    setCell(state: States | Cell, _x?: number | Vec2, _y?: number): Cell;
 
-    Resize(width: number, height: number, clear: boolean): void;
     Clear(): void;
 
     //    optionalReset?(hard: boolean): void;
@@ -14,6 +13,6 @@ interface IField {
 
     stage?: number;
     stageActions?: Array<() => boolean>;
-    
+
     Evolve?(): void;
 }

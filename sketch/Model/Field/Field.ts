@@ -1,53 +1,54 @@
 /// <reference path = "../../CanvasManager.ts"/>
 /// <reference path = "Cell.ts"/>
 
+
 class Field implements IField {
-    private _width: number;
-    private _height: number;
-    cells: Array<Array<Cell>>;
+    size: Vec2;
+    cells: Array<Cell>;
+
+    grid: Array<Array<Cell>>;
+
+    getCell(_x: number | Vec2, _y?: number) {
+        const p = Calc.toVec2(_x, _y);
+        if (this.grid[p.x] == undefined)
+            return undefined;
+        return this.grid[p.x][p.y];
+    }
+    setCell(state_cell: States | Cell, _x?: number | Vec2, _y?: number) {
+        if(state_cell instanceof Cell) {
+            const p = state_cell.pos;
+            if(this.grid[p.x] == undefined)
+                this.grid[p.x] = new Array<Cell>();
+            this.grid[p.x][p.y] = state_cell;
+            return state_cell;
+        }
+        const state = <States>state_cell;
+        const p = Calc.toVec2(_x, _y);
+        if (this.grid[p.x] == undefined) {
+            this.grid[p.x] = new Array<Cell>();
+            let cell = this.grid[p.x][p.y] = new Cell(p, state);
+            this.cells.push(cell);
+            return cell;
+        }
+        let cell = this.grid[p.x][p.y];
+        if (cell == undefined) {
+            this.grid[p.x][p.y] = cell = new Cell(p, state);
+            this.cells.push(cell);
+            return cell;
+        }
+        cell.state = state;
+        return cell;
+    }
 
     constructor(width: number, height: number) {
-        this.cells = new Array<Array<Cell>>();
-        this.Resize(width, height, true);
-    }
-
-    Resize(width: number = this._width, height: number = this._height, clear: boolean = false, filler: States = undefined) {
-        this._width = width;
-        this._height = height;
-
-        let newCells = new Array<Array<Cell>>(this._width);
-        for (let x = 0; x < this._width; x++) {
-            newCells[x] = new Array<Cell>(this._height);
-            for (let y = 0; y < this._height; y++) {
-                if (!clear && Calc.IsInside(x, y, this.cells)) {
-                    newCells[x][y] = this.cells[x][y];
-                } else {
-                    newCells[x][y] = new Cell(new Vec2(x, y));
-                }
-            }
-        }
-        this.cells = newCells;
-    }
-
-    get width() {
-        return this._width;
-    }
-    set width(v: number) {
-        this._width = v;
-        this.Resize();
-    }
-    get height() {
-        return this._height;
-    }
-    set height(v: number) {
-        this._height = v;
-        this.Resize();
+        this.size = new Vec2(width, height);
+        this.grid = new Array<Array<Cell>>();
+        this.cells = new Array<Cell>();
     }
 
     Clear() {
-        for (let x = 0; x < this._width; x++)
-            for (let y = 0; y < this._height; y++)
-                this.cells[x][y] = new Cell(new Vec2(x, y));
+        this.cells = new Array<Cell>();
+        this.grid = new Array<Array<Cell>>();
     }
 
     static DefaultPredicate = (cell: Cell) => { return cell.state == States.empty; };
@@ -62,9 +63,9 @@ class Field implements IField {
         for (const i of order) {
             const direction = World.MoveDirections[i];
             let newPoint = p.Sum(direction);
-            if (!Calc.IsPointInside(newPoint, this.cells))
+            if (!Calc.IsInside(newPoint, this.size))
                 continue;
-            let cell = this.cells[newPoint.x][newPoint.y];
+            let cell = this.grid[newPoint.x][newPoint.y];
             if (predicate(cell)) {
                 points.push(cell);
                 if (count != -1 && points.length >= count) {
@@ -77,9 +78,9 @@ class Field implements IField {
 
     GetAvailableCells(predicate = Field.DefaultPredicate) {
         let points = new Array<Cell>();
-        for (let x = 1; x < this._width; x += 2) {
-            for (let y = 1; y < this._height; y += 2) {
-                let cell = this.cells[x][y];
+        for (let x = 1; x < this.size.x; x += 2) {
+            for (let y = 1; y < this.size.y; y += 2) {
+                let cell = this.grid[x][y];
                 if (predicate(cell)) {
                     points.push(cell);
                 }
@@ -89,7 +90,9 @@ class Field implements IField {
     }
 
     MarkCell(p: Vec2, state: States) {
-        this.cells[p.x][p.y].state = state;
+        if (this.grid[p.x] == undefined)
+            this.grid[p.x] = new Array<Cell>();
+        this.grid[p.x][p.y].state = state;
     }
 
     stage = 0;

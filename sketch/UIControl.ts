@@ -13,9 +13,9 @@ abstract class UIControl {
     }
 
     static UIUpdate() {
-//        fieldDisplay.Display();
-        let stageDiv = document.getElementById("StageDiv");
-        stageDiv.innerHTML = `<b>Stage: ${fieldDisplay.stage}</b>`;
+        fieldDisplay.Display();
+        //        let stageDiv = document.getElementById("StageDiv");
+        //        stageDiv.innerHTML = `<b>Stage: ${fieldDisplay.stage}</b>`;
     }
 
     static UIEvolve(update = true) {
@@ -30,7 +30,7 @@ abstract class UIControl {
                     UIControl.TimeRangeClick();
                     UIControl.TimeRangeClick();
                 }
-            }, Math.min(4000, Math.max(500, fieldDisplay.cells.length * fieldDisplay.cells[0].length / 2.178)));
+            }, Math.min(4000, Math.max(500, fieldDisplay.size.x * fieldDisplay.size.y / 2.178)));
             res = true;
         }
         if (update) {
@@ -54,7 +54,7 @@ abstract class UIControl {
         document.getElementById("EvolveButton").onclick = () => { UIControl.UIEvolve(); };
 
         document.getElementById("ResetButton").onclick = ev => {
-//            fieldDisplay.Reset();
+            //            fieldDisplay.Reset();
         };
     }
 
