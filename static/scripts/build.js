@@ -463,6 +463,7 @@ class DLA extends FieldDisplay {
     constructor(canvasManager, width = 0, height = 0, step = 1) {
         super(canvasManager, width, height, step);
         this.$fillment = 10;
+        this.$stickines = 0.25;
         this.stageActions = [
             () => {
                 for (let i = 0; i < this.particles.length; i++) {
@@ -481,7 +482,7 @@ class DLA extends FieldDisplay {
                         let cell = this.getCell(_p);
                         if (cell == undefined)
                             continue;
-                        if (cell.state == States.frozen) {
+                        if (cell.state == States.frozen && Math.random() <= this.$stickines) {
                             p.state = States.frozen;
                             skip = true;
                             break;

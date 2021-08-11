@@ -3,6 +3,7 @@
 class DLA extends FieldDisplay {
     particles: Array<Cell>;
     $fillment = 10;
+    $stickines = 0.25;
 
     Fill(clear = false) {
         if (clear) {
@@ -55,7 +56,7 @@ class DLA extends FieldDisplay {
                     let cell = this.getCell(_p);
                     if (cell == undefined)
                         continue;
-                    if (cell.state == States.frozen) {
+                    if (cell.state == States.frozen && Math.random() <= this.$stickines) {
                         p.state = States.frozen;
                         skip = true;
                         break;
