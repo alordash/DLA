@@ -3,7 +3,7 @@
 class DLA extends FieldDisplay {
     particles: Array<Cell>;
     $fillment = 10;
-    $stickines = 0.25;
+    $stickines = 0.9;
 
     Fill(clear = false) {
         if (clear) {

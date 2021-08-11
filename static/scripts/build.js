@@ -78,7 +78,7 @@ let playTimer;
 let playing = false;
 let playStep = 50;
 let speed = parseInt(document.getElementById('speedrange').value);
-let speedDivision = 20;
+let speedDivision = 35;
 class UIControl {
     static Init() {
         UIControl.InitInputs();
