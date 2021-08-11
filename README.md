@@ -1,6 +1,6 @@
 # Diffusion Limited Aggregation
 
-Runtime [DLA](https://en.wikipedia.org/wiki/Maze_generation_algorithm) process visualizer.  
+Runtime [DLA](http://paulbourke.net/fractals/dla/) process visualizer.  
 ### [Available here (open link)](https://alordash.github.io/DLA/static/index.html)
 
 ![Demo1](previews/ls1.png)
