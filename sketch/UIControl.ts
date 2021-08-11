@@ -56,6 +56,8 @@ abstract class UIControl {
         document.getElementById("EvolveButton").onclick = () => { UIControl.UIEvolve(); };
 
         document.getElementById("ResetButton").onclick = ev => {
+            (<DLA>fieldDisplay).Fill(true);
+            fieldDisplay.Display();
             //            fieldDisplay.Reset();
         };
     }

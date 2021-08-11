@@ -122,6 +122,8 @@ class UIControl {
         };
         document.getElementById("EvolveButton").onclick = () => { UIControl.UIEvolve(); };
         document.getElementById("ResetButton").onclick = ev => {
+            fieldDisplay.Fill(true);
+            fieldDisplay.Display();
         };
     }
     static InitTimeRange() {
@@ -502,6 +504,8 @@ class DLA extends FieldDisplay {
     }
     Fill(clear = false) {
         if (clear) {
+            for (let cell of this.particles)
+                cell.state = States.empty;
             this.particles = new Array();
         }
         let chance = this.fillment / 100;

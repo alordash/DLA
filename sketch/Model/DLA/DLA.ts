@@ -5,13 +5,15 @@ class DLA extends FieldDisplay {
     fillment = 10;
 
     Fill(clear = false) {
-        if(clear) {
+        if (clear) {
+            for (let cell of this.particles)
+                cell.state = States.empty;
             this.particles = new Array<Cell>();
         }
         let chance = this.fillment / 100;
         let max = this.size.x * this.size.y * chance;
         const dif = this.particles.length - max;
-        for(let i = 0; i < dif; i++) {
+        for (let i = 0; i < dif; i++) {
             let index = Calc.IntRand(0, this.particles.length - 1);
             let cell = this.particles.splice(index, 1)[0];
             cell.state = States.empty;
@@ -23,7 +25,7 @@ class DLA extends FieldDisplay {
                     continue;
                 }
                 this.particles.push(new Cell(new Vec2(x, y), States.particle));
-                if(this.particles.length >= max) {
+                if (this.particles.length >= max) {
                     end = true;
                     break;
                 }
@@ -39,7 +41,7 @@ class DLA extends FieldDisplay {
         () => {
             for (let i = 0; i < this.particles.length; i++) {
                 let p = this.particles[i];
-                if(!Calc.IsInside(p.pos, this.size)) {
+                if (!Calc.IsInside(p.pos, this.size)) {
                     p.pos = Calc.RandomPoint(this.size);
                     continue;
                 }
