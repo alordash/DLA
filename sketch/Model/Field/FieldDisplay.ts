@@ -32,18 +32,15 @@ class FieldDisplay extends Field implements IFieldDisplay {
 
     Palette(state: States) {
         let p5 = this.canvasManager.p5;
-        let v: number;
         switch (state) {
             case States.empty:
-                v = 0;
-                p5.fill(v).stroke(v);
+                p5.fill(0);
                 break;
             case States.frozen:
-                p5.fill(0, 0, 255).stroke(0, 0, 255);
+                p5.fill(0, 0, 255);
                 break;
             case States.particle:
-                v = 255;
-                p5.fill(v).stroke(v);
+                p5.fill(255);
                 break;
 
             default:
@@ -62,7 +59,7 @@ class FieldDisplay extends Field implements IFieldDisplay {
             state = state_cell;
         }
         this.Palette(state);
-        this.canvasManager.p5.rect(p.x * this._step + 1, p.y * this._step + 1, this._step - 1, this._step - 1);
+        this.canvasManager.p5.rect(p.x * this._step, p.y * this._step, this._step, this._step);
     }
 
     MarkCell(p: Vec2, state: States) {

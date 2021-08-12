@@ -13,7 +13,7 @@ class CanvasManager {
         this.p5.background(0);
         this.p5.fill(255);
         this.p5.stroke(0);
-        this.p5.strokeWeight(2);
+        this.p5.strokeWeight(0);
     }
 
     Resize(width = this.width, height = this.height) {

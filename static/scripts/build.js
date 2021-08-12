@@ -65,7 +65,7 @@ class CanvasManager {
         this.p5.background(0);
         this.p5.fill(255);
         this.p5.stroke(0);
-        this.p5.strokeWeight(2);
+        this.p5.strokeWeight(0);
     }
     Resize(width = this.width, height = this.height) {
         this.width = width;
@@ -85,7 +85,6 @@ class UIControl {
         UIControl.InitTimeRange();
     }
     static UIUpdate() {
-        fieldDisplay.Display();
     }
     static UIEvolve(update = true) {
         let stageDiv = document.getElementById("StageDiv");
@@ -236,7 +235,7 @@ var p5Sketch = (_p) => {
         document.getElementById('Editor').appendChild(htmlElement);
         _p.fill(255);
         _p.stroke(0);
-        _p.strokeWeight(2);
+        _p.strokeWeight(0);
     };
 };
 let _p = new p5(p5Sketch);
@@ -417,18 +416,15 @@ class FieldDisplay extends Field {
     }
     Palette(state) {
         let p5 = this.canvasManager.p5;
-        let v;
         switch (state) {
             case States.empty:
-                v = 0;
-                p5.fill(v).stroke(v);
+                p5.fill(0);
                 break;
             case States.frozen:
-                p5.fill(0, 0, 255).stroke(0, 0, 255);
+                p5.fill(0, 0, 255);
                 break;
             case States.particle:
-                v = 255;
-                p5.fill(v).stroke(v);
+                p5.fill(255);
                 break;
             default:
                 break;
@@ -446,7 +442,7 @@ class FieldDisplay extends Field {
             state = state_cell;
         }
         this.Palette(state);
-        this.canvasManager.p5.rect(p.x * this._step + 1, p.y * this._step + 1, this._step - 1, this._step - 1);
+        this.canvasManager.p5.rect(p.x * this._step, p.y * this._step, this._step, this._step);
     }
     MarkCell(p, state) {
         let cell = this.getCell(p);
