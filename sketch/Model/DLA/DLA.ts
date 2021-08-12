@@ -8,7 +8,7 @@ class DLA extends FieldDisplay {
     Fill(clear = false) {
         if (clear) {
             for (let cell of this.particles)
-                cell.state = States.empty;
+            cell.state = States.empty;
             this.particles = new Array<Cell>();
         }
         let chance = this.$fillment / 100;
@@ -66,6 +66,7 @@ class DLA extends FieldDisplay {
                     this.particles.splice(i, 1);
                     i--;
                     this.setCell(p);
+                    this.DrawCell(p);
                     continue;
                 }
                 let move = moves.popRandom();
@@ -75,6 +76,7 @@ class DLA extends FieldDisplay {
                 }
                 this.DrawCell(States.empty, p.pos);
                 p.pos = _p;
+                this.DrawCell(p);
             }
             return false;
         }

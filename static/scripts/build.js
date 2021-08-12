@@ -206,7 +206,6 @@ UIControl.TimeRangeClick = () => {
             let end = Math.max(1, speed - speedDivision);
             for (let i = 0; i < end; i++) {
                 if (UIControl.UIEvolve(i == (end - 1))) {
-                    UIControl.UIUpdate();
                     return;
                 }
             }
@@ -488,6 +487,7 @@ class DLA extends FieldDisplay {
                         this.particles.splice(i, 1);
                         i--;
                         this.setCell(p);
+                        this.DrawCell(p);
                         continue;
                     }
                     let move = moves.popRandom();
@@ -497,6 +497,7 @@ class DLA extends FieldDisplay {
                     }
                     this.DrawCell(States.empty, p.pos);
                     p.pos = _p;
+                    this.DrawCell(p);
                 }
                 return false;
             }

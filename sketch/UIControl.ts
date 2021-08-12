@@ -12,7 +12,7 @@ abstract class UIControl {
     }
 
     static UIUpdate() {
-        fieldDisplay.Display();
+//        fieldDisplay.Display();
     }
 
     static UIEvolve(update = true) {
@@ -79,7 +79,6 @@ abstract class UIControl {
                 let end = Math.max(1, speed - speedDivision);
                 for (let i = 0; i < end; i++) {
                     if (UIControl.UIEvolve(i == (end - 1))) {
-                        UIControl.UIUpdate();
                         return;
                     }
                 }
